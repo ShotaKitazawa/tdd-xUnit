@@ -1,3 +1,6 @@
+import inspect
+
+
 # TestCase
 class TestCase:
     log = ""
@@ -100,6 +103,23 @@ class TestCaseTest(TestCase):
         suite.run(self.result)
         assert "2 run, 1 failed" == self.result.summary()
 
+    # TestCaseTest に記述された test.* メソッドを全て実行する
+    def AutoSelect(self):
+        suite = TestSuite()
+        cnt = 0
+        for m in inspect.getmembers(TestCaseTest):
+            if m[0].startswith("test"):
+                suite.add(TestCaseTest(m[0]))
+                cnt += 1
+        suite.run(self.result)
+        assert "{cnt} run, 0 failed".format(cnt=cnt) == self.result.summary()
+
+    # def testNested(self):
+    #    def testTemplateMethod(self):
+    #        test = WasRun("testMethod")
+    #        test.run(self.result)
+    #        assert test.log == "setUp testMethod tearDown "
+
 
 # Run Test
 suite = TestSuite()
@@ -108,6 +128,7 @@ suite.add(TestCaseTest("testResult"))
 suite.add(TestCaseTest("testFailedResult"))
 suite.add(TestCaseTest("testFailedResultFormatting"))
 suite.add(TestCaseTest("testSuite"))
+suite.add(TestCaseTest("AutoSelect"))
 result = TestResult()
 suite.run(result)
 print(result.summary())
